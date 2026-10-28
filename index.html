@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impacto orçamentário sobre a RCL considerando os cortes das classes A e B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Memorando técnico em uma coluna: texto em 68ch, tabelas na largura da folha, números tabulares */
+  --bg: #eef1f5;
+  --paper: #ffffff;
+  --ink: #142030;
+  --ink-2: #47536a;
+  --muted: #747f91;
+  --rule: #dbe1e9;
+  --accent: #1d4e89;
+  --accent-soft: #e8eef7;
+  --zebra: #f6f8fb;
+  --series-1: #2a78d6;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --ok-ink: #006300;
+  --ok-line: #0ca30c;
+  --bad-ink: #a32020;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1117; --paper: #141b24; --ink: #e6ebf1; --ink-2: #b2bccb; --muted: #8893a4; --rule: #28313d;
+    --accent: #8db8ee; --accent-soft: #1a2737; --zebra: #18202a; --series-1: #3987e5;
+    --ok-ink: #3cbf3c; --bad-ink: #f08585; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1117; --paper: #141b24; --ink: #e6ebf1; --ink-2: #b2bccb; --muted: #8893a4; --rule: #28313d;
+  --accent: #8db8ee; --accent-soft: #1a2737; --zebra: #18202a; --series-1: #3987e5;
+  --ok-ink: #3cbf3c; --bad-ink: #f08585; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--font-body); }
+article { max-width: 960px; margin: 24px auto 48px; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 40px 44px 48px; display: grid; gap: 30px; }
+header { display: grid; gap: 10px; }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1, h2 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-size: 33px; line-height: 1.18; font-weight: 700; color: var(--ink); }
+h2 { font-size: 22px; line-height: 1.25; color: var(--accent); font-weight: 600; padding-top: 18px; border-top: 1px solid var(--rule); }
+.byline { color: var(--ink-2); font-size: 15px; margin: 0; }
+section { display: grid; gap: 14px; }
+p, ul, ol { margin: 0; max-width: 68ch; }
+ul, ol { padding-left: 1.3em; display: grid; gap: 6px; }
+.aviso { border-left: 4px solid var(--warning); background: var(--accent-soft); padding: 14px 18px; border-radius: 4px; font-size: 15.5px; max-width: none; }
+.resposta { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 4px; max-width: none; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)); gap: 12px; }
+.tile { border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .l { font-size: 14px; color: var(--ink-2); }
+.tile .v { font-size: 28px; font-weight: 700; line-height: 1.15; }
+.tile .s { font-size: 14px; color: var(--muted); }
+.tile.ok { border-color: var(--ok-line); }
+.validar { font-size: .86em; color: var(--bad-ink); font-style: italic; white-space: nowrap; }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+th { background: var(--accent-soft); color: var(--ink); text-align: left; font-weight: 600; padding: 8px 10px; vertical-align: bottom; }
+td { padding: 7px 10px; border-top: 1px solid var(--rule); vertical-align: top; }
+table.peso td.num, table.lrf td:first-child { white-space: normal; }
+table.lrf .chip { white-space: nowrap; }
+tbody tr:nth-child(even) td { background: var(--zebra); }
+tbody tr.dest td { background: var(--accent-soft); font-weight: 600; }
+tfoot td { font-weight: 700; border-top: 2px solid var(--rule); }
+.num { text-align: right; white-space: nowrap; }
+table.texto td:nth-child(2) { min-width: 210px; }
+table.texto td:nth-child(3), table.comp td:nth-child(3), table.cen td:last-child { color: var(--ink-2); font-size: 14px; text-align: left; white-space: normal; }
+table.peso td:first-child { min-width: 280px; }
+table.lrf td:last-child { text-align: left; white-space: normal; }
+.nota { font-size: 14.5px; color: var(--ink-2); }
+.formula { font-weight: 600; background: var(--accent-soft); padding: 10px 14px; border-radius: 4px; max-width: none; }
+.chip { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--rule); }
+.chip-ok { color: var(--ok-ink); border-color: var(--ok-line); }
+.chip-alerta { color: var(--bad-ink); border-color: var(--warning); }
+figure { margin: 0; display: grid; gap: 8px; }
+figcaption { font-size: 14.5px; color: var(--ink-2); max-width: 72ch; }
+.chart-wrap { overflow-x: auto; }
+.chart-wrap svg { width: 100%; min-width: 620px; height: auto; display: block; font-family: var(--font-body); }
+svg .banda { fill: var(--accent-soft); }
+svg .grid { stroke: var(--rule); stroke-width: 1; }
+svg .axis { stroke: var(--muted); stroke-width: 1; }
+svg .tick { fill: var(--muted); font-size: 11.5px; }
+svg .lim { stroke-width: 2; }
+svg .lim-warning { stroke: var(--warning); }
+svg .lim-serious { stroke: var(--serious); }
+svg .lim-critical { stroke: var(--critical); }
+svg .sw-warning { fill: var(--warning); }
+svg .sw-serious { fill: var(--serious); }
+svg .sw-critical { fill: var(--critical); }
+svg .lbl { fill: var(--ink-2); font-size: 12px; }
+svg .row { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+svg .row-prov { fill: var(--accent); }
+svg .row-sub { fill: var(--muted); font-size: 11.5px; }
+svg .val { fill: var(--ink); font-size: 12.5px; font-weight: 700; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+svg .dot-sem { fill: var(--muted); stroke: var(--paper); stroke-width: 2; }
+svg .dot-com { fill: var(--series-1); stroke: var(--paper); stroke-width: 2; }
+svg .conn { stroke: var(--series-1); stroke-width: 2; }
+svg .seta { fill: var(--series-1); }
+svg .hit { outline: none; }
+svg .hit:focus-visible circle:last-child, svg .hit:focus-visible line { stroke: var(--ink); stroke-width: 3; }
+#tip { position: fixed; z-index: 10; background: var(--ink); color: var(--paper); font-size: 13.5px; padding: 6px 10px; border-radius: 4px; pointer-events: none; max-width: 300px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fontes { font-size: 15px; }
+footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; }
+@media (max-width: 640px) {
+  article { margin: 0; border: 0; border-radius: 0; padding: 24px 16px 40px; }
+  h1 { font-size: 26px; }
+  .tile .v { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<article>
+<header>
+<div class="eyebrow">Estudo de impacto orçamentário-financeiro · Exercício de 2027 · LRF, art. 16</div>
+<h1>Impacto orçamentário sobre a RCL considerando os cortes das classes A e B</h1>
+<p class="byline">Para a Mesa Diretora, a Diretoria-Geral, a Diretoria de Área Contábil e de Gestão Fiscal (DACGF) e a área orçamentária e financeira da Assembleia Legislativa do Tocantins. Estudo feito por servidor efetivo, sem caráter oficial. 28 de outubro de 2026.</p>
+</header>
+
+<p class="aviso"><strong>Advertência.</strong> Estudo feito por servidor sem formação em Direito, a partir do texto das normas, da planilha de remuneração dos novatos de setembro de 2026 e do Relatório de Apontamentos do Balancete da DACGF de agosto de 2026. Não substitui a manifestação da DACGF, da área orçamentária, do IGEPREV nem parecer jurídico. Os pontos marcados (validar) dependem de conferência na fonte.</p>
+
+<div class="tiles">
+<div class="tile"><span class="l">Custo em 2027</span><span class="v">R$ 5,10 mi</span><span class="s">fevereiro a dezembro, com encargos</span></div>
+<div class="tile"><span class="l">Peso na folha de 2027</span><span class="v">1,83%</span><span class="s">da folha de pessoal projetada pela DACGF</span></div>
+<div class="tile"><span class="l">Peso na RCL de 2027</span><span class="v">0,028%</span><span class="s">sobre a RCL provável de R$ 18,32 bi</span></div>
+<div class="tile ok"><span class="l">Despesa com pessoal com a proposta</span><span class="v">1,504%</span><span class="s"><span class="chip chip-ok"><span aria-hidden="true">●</span> abaixo do alerta de 1,59%</span></span></div>
+</div>
+
+<section>
+<h2>1. Resumo</h2>
+<ul>
+<li>Corte das classes A e B: os 81 servidores efetivos empossados entre abril de 2025 e setembro de 2026 passam do padrão A1 direto ao C13, primeiro padrão da classe C. A diferença de vencimento é de R$ 335.854,83 por mês.</li>
+<li>Com vigência a partir de fevereiro de 2027, 13º, terço de férias, contribuição patronal de 20,20% e data-base de 5% em maio, o custo em 2027 é de R$ 5.097.064,44. Isso equivale a 1,83% da folha de pessoal projetada e a 1,08% do orçamento da Casa.</li>
+<li>Pelo histórico, a RCL de 2027 deve ficar perto de R$ 18,32 bi, com o crescimento médio de 8,65% ao ano de 2022 a 2025. A DACGF usa R$ 17,11 bi, com 5% ao ano, abaixo do menor crescimento registrado desde 2018 (6,32%).</li>
+<li>Com a RCL pelo histórico, a despesa com pessoal passa de 1,476% para 1,504% da RCL e fica abaixo do limite de alerta (1,59%). Só no cenário prudente da DACGF ela chega a 1,610%: passa o alerta, que não traz vedações, e fica R$ 11.732.298,28 abaixo do prudencial.</li>
+<li>O fim do parcelamento do IGEPREV libera R$ 6.000.350,93 no orçamento de 2027, 118% do custo da proposta.</li>
+</ul>
+</section>
+
+<section>
+<h2>2. O corte das classes A e B</h2>
+<p>A carreira da Lei 4.208/2023 tem classes de seis padrões: A (1 a 6), B (7 a 12), C (13 a 18) e assim por diante. A proposta enquadra no padrão C13 os servidores efetivos empossados em 2025 e 2026, hoje no padrão A1, cortando as classes A e B. O estudo usa os 81 servidores marcados com "Salário C13" na planilha de remuneração de setembro de 2026, admitidos entre 01/04/2025 e 01/09/2026. Só o vencimento muda. O valor fixo de R$ 2.100 que os novatos recebem além do vencimento não depende do padrão e fica fora do cálculo.</p>
+<div class="tbl-wrap"><table class=""><thead><tr><th class="">Cargo</th><th class="num">Servidores</th><th class="num">Vencimento A1</th><th class="num">Vencimento C13</th><th class="num">Diferença por servidor</th><th class="num">Diferença mensal do grupo</th></tr></thead><tbody><tr><td class="">Técnico</td><td class="num">38</td><td class="num">4.318,92</td><td class="num">7.756,15</td><td class="num">3.437,23</td><td class="num">130.614,74</td></tr><tr><td class="">Analista</td><td class="num">35</td><td class="num">6.380,99</td><td class="num">11.459,34</td><td class="num">5.078,35</td><td class="num">177.742,25</td></tr><tr><td class="">Policial</td><td class="num">8</td><td class="num">4.318,92</td><td class="num">7.756,15</td><td class="num">3.437,23</td><td class="num">27.497,84</td></tr></tbody><tfoot><tr><td class="">Total</td><td class="num">81</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num">335.854,83</td></tr></tfoot></table></div>
+<p class="nota">Valores mensais em reais, tabela de 2026 (Anexo IV, redação da Lei 5.038/2026). O Policial Legislativo segue a tabela do Técnico, como na planilha de origem <span class="validar">(validar)</span>.</p>
+</section>
+
+<section>
+<h2>3. A RCL de 2027 pelo histórico</h2>
+<p>A série da DACGF (item 1.3 do relatório) mostra a RCL do Estado e o orçamento da Casa desde 2018. De 2018 a 2025 a RCL cresceu todos os anos, de 6,32% a 20,42%. Os valores de 2026 e 2027 são projeções da DACGF com 5% ao ano, por prudência.</p>
+<div class="tbl-wrap"><table class=""><thead><tr><th class="">Ano</th><th class="num">RCL</th><th class="num">Crescimento</th><th class="num">Orçamento inicial da Casa</th><th class="num">Orçamento / RCL</th><th class="num"></th></tr></thead><tbody><tr><td class="">2018</td><td class="num">7.189.985.506,93</td><td class="num"></td><td class="num">249.450.793,00</td><td class="num">3,47%</td><td class="num">realizada</td></tr><tr><td class="">2019</td><td class="num">8.014.091.020,32</td><td class="num">11,46%</td><td class="num">249.523.909,00</td><td class="num">3,11%</td><td class="num">realizada</td></tr><tr><td class="">2020</td><td class="num">8.905.146.750,64</td><td class="num">11,12%</td><td class="num">263.465.352,00</td><td class="num">2,96%</td><td class="num">realizada</td></tr><tr><td class="">2021</td><td class="num">10.052.110.448,21</td><td class="num">12,88%</td><td class="num">244.232.382,00</td><td class="num">2,43%</td><td class="num">realizada</td></tr><tr><td class="">2022</td><td class="num">12.104.467.859,45</td><td class="num">20,42%</td><td class="num">266.213.296,00</td><td class="num">2,20%</td><td class="num">realizada</td></tr><tr><td class="">2023</td><td class="num">12.991.895.148,01</td><td class="num">7,33%</td><td class="num">312.578.598,00</td><td class="num">2,41%</td><td class="num">realizada</td></tr><tr><td class="">2024</td><td class="num">14.600.906.289,62</td><td class="num">12,38%</td><td class="num">359.242.980,00</td><td class="num">2,46%</td><td class="num">realizada</td></tr><tr><td class="">2025</td><td class="num">15.523.452.300,73</td><td class="num">6,32%</td><td class="num">393.948.773,00</td><td class="num">2,54%</td><td class="num">realizada</td></tr><tr><td class="">2026</td><td class="num">16.299.624.915,77</td><td class="num">5,00%</td><td class="num">449.019.823,00</td><td class="num">2,75%</td><td class="num">projeção DACGF</td></tr><tr><td class="">2027</td><td class="num">17.114.606.161,56</td><td class="num">5,00%</td><td class="num">471.470.815,00</td><td class="num">2,75%</td><td class="num">projeção DACGF</td></tr></tbody></table></div>
+<p>Os cenários abaixo aplicam a taxa de cada leitura do histórico a 2026 e a 2027, a partir da RCL realizada de 2025.</p>
+<div class="tbl-wrap"><table class="cen"><thead><tr><th class="">Cenário</th><th class="num">Crescimento ao ano</th><th class="num">RCL 2026</th><th class="num">RCL 2027</th><th class="num">Leitura</th></tr></thead><tbody><tr><td class="">Prudente (DACGF)</td><td class="num">5,00%</td><td class="num">16.299.624.915,77</td><td class="num">17.114.606.161,56</td><td class="num">Premissa da DACGF, abaixo do menor crescimento registrado</td></tr><tr><td class="">Menor crescimento da série</td><td class="num">6,32%</td><td class="num">16.504.288.607,37</td><td class="num">17.547.098.232,94</td><td class="num">Repete o pior ano (2025)</td></tr><tr class="dest"><td class="">Tendência dos últimos 3 anos</td><td class="num">8,65%</td><td class="num">16.865.627.916,61</td><td class="num"><strong>18.323.849.586,49</strong></td><td class="num">Cenário provável</td></tr><tr><td class="">Média da série 2018-2025</td><td class="num">11,62%</td><td class="num">17.327.654.603,90</td><td class="num">19.341.549.048,21</td><td class="num">Repete o ritmo de 2018 a 2025</td></tr></tbody></table></div>
+<p class="resposta"><strong>RCL de 2027:</strong> pelo histórico, cerca de <strong>R$ 18,32 bi</strong>, se a RCL mantiver o ritmo dos últimos três anos. Mesmo repetindo o pior ano da série, ela chegaria a R$ 17,55 bi. Os R$ 17,11 bi da DACGF são um piso prudente.</p>
+</section>
+
+<section>
+<h2>4. Custo em 2027</h2>
+<p class="formula">Custo = vencimentos + 13º + terço de férias + 20,20% × (vencimentos + 13º)</p>
+<div class="tbl-wrap"><table class="comp"><thead><tr><th class="">Componente</th><th class="num">2027 (R$)</th><th class="num">Base</th></tr></thead><tbody><tr><td class="">Diferença de vencimento (fevereiro a dezembro)</td><td class="num">3.828.745,06</td><td class="num">C13 − A1; +5% a partir de maio</td></tr><tr><td class="">13º salário</td><td class="num">323.260,27</td><td class="num">Dezembro × 11/12</td></tr><tr><td class="">Terço de férias</td><td class="num">106.354,03</td><td class="num">1/3 da diferença, rateado</td></tr><tr><td class="">Contribuição patronal 20,20%</td><td class="num">838.705,08</td><td class="num">Sobre a diferença e o 13º</td></tr></tbody><tfoot><tr><td class="">Total</td><td class="num">5.097.064,44</td><td class="num"></td></tr></tfoot></table></div>
+<p>Quadro mês a mês no formato da DACGF (item 1.2): folha projetada somada ao impacto da proposta, já com encargos. Em janeiro não há impacto. De fevereiro a abril entram a diferença de vencimento, o terço de férias rateado e a patronal; de maio a novembro, com a data-base de 5%; dezembro inclui o 13º e a patronal sobre ele.</p>
+<div class="tbl-wrap"><table class=""><thead><tr><th class="">Mês</th><th class="num">Folha projetada DACGF</th><th class="num">Impacto da proposta</th><th class="num">Folha com a proposta</th><th class="num">Acumulado com a proposta</th><th class="num">Impacto / folha</th></tr></thead><tbody><tr><td class="">Janeiro</td><td class="num">21.236.848,60</td><td class="num">0,00</td><td class="num">21.236.848,60</td><td class="num">21.236.848,60</td><td class="num">0,00%</td></tr><tr><td class="">Fevereiro</td><td class="num">21.236.848,60</td><td class="num">413.026,81</td><td class="num">21.649.875,41</td><td class="num">42.886.724,01</td><td class="num">1,94%</td></tr><tr><td class="">Março</td><td class="num">21.236.848,60</td><td class="num">413.026,81</td><td class="num">21.649.875,41</td><td class="num">64.536.599,41</td><td class="num">1,94%</td></tr><tr><td class="">Abril</td><td class="num">21.285.453,13</td><td class="num">413.026,81</td><td class="num">21.698.479,94</td><td class="num">86.235.079,35</td><td class="num">1,94%</td></tr><tr><td class="">Maio</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">108.411.162,62</td><td class="num">1,99%</td></tr><tr><td class="">Junho</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">130.587.245,88</td><td class="num">1,99%</td></tr><tr><td class="">Julho</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">152.763.329,15</td><td class="num">1,99%</td></tr><tr><td class="">Agosto</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">174.939.412,42</td><td class="num">1,99%</td></tr><tr><td class="">Setembro</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">197.115.495,68</td><td class="num">1,99%</td></tr><tr><td class="">Outubro</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">219.291.578,95</td><td class="num">1,99%</td></tr><tr><td class="">Novembro</td><td class="num">21.742.405,12</td><td class="num">433.678,15</td><td class="num">22.176.083,27</td><td class="num">241.467.662,22</td><td class="num">1,99%</td></tr><tr><td class="">Dezembro</td><td class="num">41.310.569,73</td><td class="num">822.237,00</td><td class="num">42.132.806,73</td><td class="num">283.600.468,94</td><td class="num">1,99%</td></tr></tbody><tfoot><tr><td class="">Total</td><td class="num">278.503.404,50</td><td class="num">5.097.064,44</td><td class="num">283.600.468,94</td><td class="num"></td><td class="num">1,83%</td></tr></tfoot></table></div>
+<p class="nota">A necessidade de 2027 para pessoal e encargos passa de R$ 278.503.404,50 para R$ 283.600.468,94 (+1,83%). A planilha de origem, que multiplicava a diferença por 12 sem encargos, indicava R$ 4.030.257,96. A soma dos meses da DACGF difere em R$ 0,04 do total publicado por arredondamento na tabela de origem.</p>
+<div class="tbl-wrap"><table class=""><thead><tr><th class="">Cenário</th><th class="num">Custo em 2027 (R$)</th><th class="num">Diferença (R$)</th></tr></thead><tbody><tr><td class="">Principal: vigência a partir de fevereiro</td><td class="num">5.097.064,44</td><td class="num">0,00</td></tr><tr><td class="">Vigência em janeiro (ato nulo pela LRF, art. 21, II)</td><td class="num">5.545.414,78</td><td class="num">448.350,34</td></tr><tr><td class="">Vigência em maio, junto da data-base</td><td class="num">3.752.013,43</td><td class="num">-1.345.051,01</td></tr><tr><td class="">Com previdência complementar (patronal até o teto do RGPS e 8,5% acima)</td><td class="num">4.946.011,75</td><td class="num">-151.052,69</td></tr></tbody></table></div>
+<p class="nota">Previdência complementar: se o plano da Lei 3.895/2022 já valia quando os novatos tomaram posse, a patronal do RPPS fica limitada ao teto do RGPS (R$ 8.475,55 em 2026) e o Estado contribui com até 8,5% sobre o que passar do teto; só o Analista em C13 passa do teto <span class="validar">(validar)</span>.</p>
+</section>
+
+<section>
+<h2>5. Peso na folha e no orçamento</h2>
+<div class="tbl-wrap"><table class="peso"><thead><tr><th class="">Indicador</th><th class="num">Base</th><th class="num">Proposta em relação à base</th></tr></thead><tbody><tr><td class="">Folha de pessoal e encargos projetada para 2027 (DACGF, item 1.2)</td><td class="num">R$ 278.503.404,54</td><td class="num">1,83%</td></tr><tr><td class="">Maior impacto mensal (maio a novembro) sobre a folha do mês</td><td class="num">R$ 433.678,15 de R$ 21.742.405,12</td><td class="num">1,99%</td></tr><tr><td class="">Orçamento da Casa para 2027 (DACGF, item 1.3)</td><td class="num">R$ 471.470.815,00</td><td class="num">1,08%</td></tr><tr><td class="">RCL de 2027 provável (tendência dos últimos 3 anos)</td><td class="num">R$ 18,32 bi</td><td class="num">0,028%</td></tr><tr><td class="">RCL de 2027 prudente (DACGF)</td><td class="num">R$ 17,11 bi</td><td class="num">0,030%</td></tr><tr><td class="">Fim do parcelamento do IGEPREV, valor pago em 2026 (DACGF, item 1.1)</td><td class="num">R$ 6.000.350,93</td><td class="num">cobre 118% do custo</td></tr><tr><td class="">Saldo financeiro positivo em agosto de 2026 (DACGF, item 2)</td><td class="num">R$ 6.643.396,02</td><td class="num">cobre 130% do custo</td></tr><tr><td class="">Custo médio por servidor alcançado</td><td class="num">R$ 62.926,72 no ano</td><td class="num">R$ 5.720,61 por mês</td></tr></tbody></table></div>
+<p>A proposta acrescenta menos de 2% à folha de pessoal de 2027 e cerca de 1% ao orçamento da Casa. O espaço aberto no orçamento pelo fim do parcelamento do IGEPREV e o saldo financeiro de agosto de 2026 são, cada um, maiores que o custo do ano.</p>
+</section>
+
+<section>
+<h2>6. Efeito sobre os limites da LRF</h2>
+<figure>
+<div class="chart-wrap">
+<svg viewBox="0 0 720 250" role="img" aria-labelledby="g-tit g-desc">
+<title id="g-tit">Despesa com pessoal de 2027 em % da RCL, sem e com a proposta, em quatro cenários de RCL</title>
+<desc id="g-desc">Prudente (DACGF): de 1,580% para 1,610%. Menor crescimento da série: de 1,541% para 1,570%. Tendência dos últimos 3 anos: de 1,476% para 1,504%. Média da série 2018-2025: de 1,398% para 1,424%. Alerta 1,590%, prudencial 1,678%, máximo 1,767%.</desc>
+<defs><marker id="seta" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="seta"/></marker></defs>
+<rect class="banda" x="0" y="126" width="720" height="40" rx="3"/>
+<line class="grid" x1="220.0" x2="220.0" y1="44" y2="212"/>
+<text class="tick" x="220.0" y="230" text-anchor="middle">1,35%</text>
+<line class="grid" x1="273.3" x2="273.3" y1="44" y2="212"/>
+<text class="tick" x="273.3" y="230" text-anchor="middle">1,40%</text>
+<line class="grid" x1="326.7" x2="326.7" y1="44" y2="212"/>
+<text class="tick" x="326.7" y="230" text-anchor="middle">1,45%</text>
+<line class="grid" x1="380.0" x2="380.0" y1="44" y2="212"/>
+<text class="tick" x="380.0" y="230" text-anchor="middle">1,50%</text>
+<line class="grid" x1="433.3" x2="433.3" y1="44" y2="212"/>
+<text class="tick" x="433.3" y="230" text-anchor="middle">1,55%</text>
+<line class="grid" x1="486.7" x2="486.7" y1="44" y2="212"/>
+<text class="tick" x="486.7" y="230" text-anchor="middle">1,60%</text>
+<line class="grid" x1="540.0" x2="540.0" y1="44" y2="212"/>
+<text class="tick" x="540.0" y="230" text-anchor="middle">1,65%</text>
+<line class="grid" x1="593.3" x2="593.3" y1="44" y2="212"/>
+<text class="tick" x="593.3" y="230" text-anchor="middle">1,70%</text>
+<line class="grid" x1="646.7" x2="646.7" y1="44" y2="212"/>
+<text class="tick" x="646.7" y="230" text-anchor="middle">1,75%</text>
+<line class="grid" x1="700.0" x2="700.0" y1="44" y2="212"/>
+<text class="tick" x="700.0" y="230" text-anchor="middle">1,80%</text>
+<line class="axis" x1="220" x2="700" y1="212" y2="212"/>
+<circle class="dot-sem" cx="8" cy="12" r="5"/><text class="lbl" x="20" y="16">Sem a proposta</text><circle class="dot-com" cx="8" cy="30" r="5"/><text class="lbl" x="20" y="34">Com a proposta</text>
+<g class="hit" tabindex="0" data-tip="Alerta: 1,590% da RCL"><rect x="466.0" y="4" width="20" height="208" fill="transparent"/><line class="lim lim-warning" x1="476.0" x2="476.0" y1="22" y2="212"/><rect class="sw-warning" x="432.0" y="8" width="8" height="8" rx="1"/><text class="lbl" x="444.0" y="16">Alerta 1,590%</text></g>
+<g class="hit" tabindex="0" data-tip="Prudencial: 1,678% da RCL"><rect x="560.2" y="20" width="20" height="192" fill="transparent"/><line class="lim lim-serious" x1="570.2" x2="570.2" y1="38" y2="212"/><rect class="sw-serious" x="526.2" y="24" width="8" height="8" rx="1"/><text class="lbl" x="538.2" y="32">Prudencial 1,678%</text></g>
+<g class="hit" tabindex="0" data-tip="Máximo: 1,767% da RCL"><rect x="654.4" y="4" width="20" height="208" fill="transparent"/><line class="lim lim-critical" x1="664.4" x2="664.4" y1="22" y2="212"/><rect class="sw-critical" x="620.4" y="8" width="8" height="8" rx="1"/><text class="lbl" x="632.4" y="16">Máximo 1,767%</text></g>
+<text class="row" x="210" y="64" text-anchor="end">Prudente (DACGF)</text><text class="row-sub" x="210" y="79" text-anchor="end">RCL R$ 17,11 bi · 5,00% a.a.</text>
+<line class="conn" x1="472.3" x2="488.1" y1="66" y2="66" marker-end="url(#seta)"/>
+<g class="hit" tabindex="0" data-tip="Prudente (DACGF), sem a proposta: 1,580% da RCL"><circle cx="465.3" cy="66" r="13" fill="transparent"/><circle class="dot-sem" cx="465.3" cy="66" r="6"/></g>
+<g class="hit" tabindex="0" data-tip="Prudente (DACGF), com a proposta: 1,610% da RCL"><circle cx="497.1" cy="66" r="13" fill="transparent"/><circle class="dot-com" cx="497.1" cy="66" r="6"/></g>
+<text class="val" x="508.1" y="70">1,610%</text>
+<text class="row" x="210" y="104" text-anchor="end">Menor crescimento da série</text><text class="row-sub" x="210" y="119" text-anchor="end">RCL R$ 17,55 bi · 6,32% a.a.</text>
+<line class="conn" x1="430.8" x2="445.8" y1="106" y2="106" marker-end="url(#seta)"/>
+<g class="hit" tabindex="0" data-tip="Menor crescimento da série, sem a proposta: 1,541% da RCL"><circle cx="423.8" cy="106" r="13" fill="transparent"/><circle class="dot-sem" cx="423.8" cy="106" r="6"/></g>
+<g class="hit" tabindex="0" data-tip="Menor crescimento da série, com a proposta: 1,570% da RCL"><circle cx="454.8" cy="106" r="13" fill="transparent"/><circle class="dot-com" cx="454.8" cy="106" r="6"/></g>
+<text class="val" x="465.8" y="110">1,570%</text>
+<text class="row row-prov" x="210" y="144" text-anchor="end">Tendência dos últimos 3 anos</text><text class="row-sub" x="210" y="159" text-anchor="end">RCL R$ 18,32 bi · 8,65% a.a.</text>
+<line class="conn" x1="361.1" x2="374.8" y1="146" y2="146" marker-end="url(#seta)"/>
+<g class="hit" tabindex="0" data-tip="Tendência dos últimos 3 anos, sem a proposta: 1,476% da RCL"><circle cx="354.1" cy="146" r="13" fill="transparent"/><circle class="dot-sem" cx="354.1" cy="146" r="6"/></g>
+<g class="hit" tabindex="0" data-tip="Tendência dos últimos 3 anos, com a proposta: 1,504% da RCL"><circle cx="383.8" cy="146" r="13" fill="transparent"/><circle class="dot-com" cx="383.8" cy="146" r="6"/></g>
+<text class="val" x="394.8" y="150">1,504%</text>
+<text class="row" x="210" y="184" text-anchor="end">Média da série 2018-2025</text><text class="row-sub" x="210" y="199" text-anchor="end">RCL R$ 19,34 bi · 11,62% a.a.</text>
+<line class="conn" x1="278.3" x2="290.4" y1="186" y2="186" marker-end="url(#seta)"/>
+<g class="hit" tabindex="0" data-tip="Média da série 2018-2025, sem a proposta: 1,398% da RCL"><circle cx="271.3" cy="186" r="13" fill="transparent"/><circle class="dot-sem" cx="271.3" cy="186" r="6"/></g>
+<g class="hit" tabindex="0" data-tip="Média da série 2018-2025, com a proposta: 1,424% da RCL"><circle cx="299.4" cy="186" r="13" fill="transparent"/><circle class="dot-com" cx="299.4" cy="186" r="6"/></g>
+<text class="val" x="310.4" y="190">1,424%</text>
+</svg>
+</div>
+<figcaption>Despesa com pessoal projetada para o 3º quadrimestre de 2027 (R$ 270.410.777,35, da DACGF), sem e com a proposta, em cada cenário de RCL. A faixa destacada é o cenário provável. Prudencial e máximo derivados do alerta de 1,59% <span class="validar">(validar)</span>.</figcaption>
+</figure>
+<div class="tbl-wrap"><table class="lrf"><thead><tr><th class="">Cenário de RCL</th><th class="num">RCL 2027</th><th class="num">Sem a proposta</th><th class="num">Com a proposta</th><th class="num">Margem até o alerta</th><th class="num">Margem até o prudencial</th><th class="num">Situação</th></tr></thead><tbody><tr><td class="">Prudente (DACGF)</td><td class="num">R$ 17,11 bi</td><td class="num">1,580%</td><td class="num"><strong>1,610%</strong></td><td class="num">-3.385.603,83</td><td class="num">11.732.298,28</td><td class="num"><span class="chip chip-alerta"><span aria-hidden="true">▲</span> acima do alerta</span></td></tr><tr><td class="">Menor crescimento da série</td><td class="num">R$ 17,55 bi</td><td class="num">1,541%</td><td class="num"><strong>1,570%</strong></td><td class="num">3.491.020,11</td><td class="num">18.990.956,88</td><td class="num"><span class="chip chip-ok"><span aria-hidden="true">●</span> abaixo do alerta</span></td></tr><tr class="dest"><td class="">Tendência dos últimos 3 anos</td><td class="num">R$ 18,32 bi</td><td class="num">1,476%</td><td class="num"><strong>1,504%</strong></td><td class="num">15.841.366,63</td><td class="num">32.027.433,76</td><td class="num"><span class="chip chip-ok"><span aria-hidden="true">●</span> abaixo do alerta</span></td></tr><tr><td class="">Média da série 2018-2025</td><td class="num">R$ 19,34 bi</td><td class="num">1,398%</td><td class="num"><strong>1,424%</strong></td><td class="num">32.022.788,07</td><td class="num">49.107.823,06</td><td class="num"><span class="chip chip-ok"><span aria-hidden="true">●</span> abaixo do alerta</span></td></tr></tbody></table></div>
+<p>Em três dos quatro cenários a despesa com pessoal fica abaixo do limite de alerta mesmo com a proposta. No cenário prudente da DACGF, a despesa já projetada sem a proposta está a R$ 1.711.460,62 do alerta; com a proposta, passa dele por R$ 3.385.603,83. Acima do alerta, o Tribunal de Contas emite alerta ao Poder (LRF, art. 59, §1º, II), sem vedações. As vedações começam no prudencial (art. 22, parágrafo único), que fica distante em todos os cenários.</p>
+</section>
+
+<section>
+<h2>7. Premissas e base legal</h2>
+<div class="tbl-wrap"><table class="texto"><thead><tr><th class="">Premissa</th><th class="">Valor adotado</th><th class="">Fonte</th></tr></thead><tbody><tr><td class="">Vigência</td><td class="">A partir de 1º de fevereiro de 2027</td><td class="">Mandato da Mesa termina em 31/01/2027; LRF, art. 21, II</td></tr><tr><td class="">Corte das classes A e B</td><td class="">A1 → C13, diferença fixa em 2027</td><td class="">Lei 4.208/2023, Anexo IV (redação da Lei 5.038/2026)</td></tr><tr><td class="">Data-base</td><td class="">5% em maio de 2027, também sobre a diferença</td><td class="">DACGF, item 1.2</td></tr><tr><td class="">13º salário</td><td class="">Remuneração de dezembro × 11/12</td><td class="">CF, art. 7º, VIII, c/c art. 39, §3º</td></tr><tr><td class="">Terço de férias</td><td class="">1/3 da diferença mensal, rateado</td><td class="">CF, art. 7º, XVII, c/c art. 39, §3º</td></tr><tr><td class="">Contribuição patronal</td><td class="">20,20% sobre a diferença e o 13º; não incide sobre o adicional de férias</td><td class="">Lei 3.736/2020, art. 1º, II, b; LC 150/2023, arts. 14, I, f, IV e §3º, e 20, §3º</td></tr><tr><td class="">Despesa com pessoal de 2027 sem a proposta</td><td class="">R$ 270.410.777,35, a mesma em todos os cenários de RCL</td><td class="">DACGF, item 1.6 (1,58% da RCL de R$ 17,11 bi)</td></tr><tr><td class="">RCL de 2027</td><td class="">Quatro cenários pelo histórico (item 3)</td><td class="">DACGF, item 1.3</td></tr><tr><td class="">Previdência complementar</td><td class="">Não aplicada (cenário mais caro); ver o item 4</td><td class="">Lei 3.895/2022 <span class="validar">(validar)</span></td></tr></tbody></table></div>
+<ul>
+<li><strong>LRF, arts. 16 e 17:</strong> estimativa do impacto, declaração do ordenador de despesa, premissas e metodologia, origem dos recursos e compensação da despesa obrigatória de caráter continuado.</li>
+<li><strong>LRF, art. 21, II e III:</strong> nulidade do ato que aumente a despesa com pessoal nos 180 dias anteriores ao fim do mandato do titular do Poder ou que preveja parcelas para depois desse fim.</li>
+<li><strong>LRF, arts. 22 e 59, §1º, II:</strong> limites prudencial e de alerta.</li>
+<li><strong>CF, art. 169, §1º, e ADCT, art. 113:</strong> prévia dotação, autorização específica na LDO e estimativa de impacto na proposição.</li>
+<li><strong>LC estadual 150/2023, arts. 13, §§3º e 4º, 14 e 20:</strong> consulta ao IGEPREV com estudo atuarial, base de cálculo das contribuições e Plano Previdenciário para quem ingressou a partir de 01/06/2012.</li>
+<li><strong>Lei estadual 3.736/2020, art. 1º, II, b</strong> (redação da Lei 4.505/2024): contribuição patronal de 20,20% no Plano Previdenciário.</li>
+</ul>
+</section>
+
+<section>
+<h2>8. Condições para a viabilidade</h2>
+<ol>
+<li>Calendário: o mandato da Mesa termina em 31/01/2027. Aprovação e efeitos ficam para a Mesa que toma posse em 1º de fevereiro de 2027, fora da janela de 180 dias do art. 21 da LRF. Em janeiro o custo seria de R$ R$ 5,55 mi, mas o ato seria nulo.</li>
+<li>DACGF: incluir o evento no estudo de impacto da despesa com pessoal de 2027 (quadro do item 1.2) e conferir este cálculo.</li>
+<li>Ordenador de despesa: declarar a adequação à LOA e a compatibilidade com o PPA e a LDO (LRF, art. 16, II).</li>
+<li>Orçamento: prever dotação na LOA 2027 e autorização específica na LDO 2027 (CF, art. 169, §1º).</li>
+<li>IGEPREV: consultar, com estudo atuarial, e prever a despesa previdenciária (LC 150/2023, art. 13, §§3º e 4º).</li>
+<li>Compensação: indicar o fim do parcelamento do IGEPREV como origem dos recursos e demonstrar que as metas fiscais não serão afetadas (LRF, art. 17, §§1º e 2º).</li>
+</ol>
+</section>
+
+<section>
+<h2>9. Pontos a validar</h2>
+<ul>
+<li>RCL de 2026 realizada: a DACGF ainda usa projeção. O Relatório de Gestão Fiscal do Estado do 2º quadrimestre de 2026 permite atualizar os cenários.</li>
+<li>Limites prudencial (1,678%) e máximo (1,767%), derivados do alerta de 1,59%.</li>
+<li>Policial Legislativo na tabela do Técnico.</li>
+<li>Aplicação da previdência complementar (Lei 3.895/2022) aos novatos: data da autorização da PREVIC e teto do RGPS de 2026.</li>
+<li>Se o parcelamento do IGEPREV entrava na despesa total com pessoal; o espaço que ele libera é seguro no orçamento, e na LRF depende disso.</li>
+<li>Quadro de novatos: a folha de outubro de 2026 lista 86 concursados admitidos em 2025 e 2026. Sete Analistas admitidos em agosto e setembro de 2026 não estão na planilha de setembro, e dois Analistas da planilha não aparecem na folha de outubro. Cada Analista a mais custa cerca de R$ 77.071,03 em 2027.</li>
+</ul>
+</section>
+
+<section class="fontes">
+<h2>10. Fontes</h2>
+<ul>
+<li><a href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp101.htm">Lei Complementar 101/2000 (LRF)</a> e <a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm">Constituição Federal</a></li>
+<li><a href="https://www.al.to.leg.br/arquivos/lei_3736-2020_53522.PDF">Lei estadual 3.736/2020, texto compilado</a> (alíquotas do RPPS-TO)</li>
+<li><a href="https://sapl.al.to.leg.br/media/sapl/public/normajuridica/2023/830/lei_150-2023.pdf">Lei Complementar estadual 150/2023</a> e <a href="https://www.al.to.leg.br/arquivos/lei_159-2024_73098.PDF">LC 159/2024</a> (RPPS-TO)</li>
+<li><a href="https://sapl.al.to.leg.br/media/sapl/public/normajuridica/2022/348/lei_3895-2022.pdf">Lei estadual 3.895/2022</a> (previdência complementar)</li>
+<li>Lei estadual 4.208/2023, Anexo IV, na redação da Lei 5.038/2026 (tabela de vencimentos)</li>
+<li>Relatório de Análise Contábil e de Apontamentos, DACGF, agosto de 2026 (SEI, assinado em 14/10/2026): itens 1.1 a 1.6 e 2</li>
+<li>Planilha de remuneração dos novatos, setembro de 2026, e folha de remuneração de outubro de 2026</li>
+</ul>
+</section>
+
+<footer>Memória de cálculo com fórmulas editáveis: planilha impacto-orcamentario-novatos.xlsx (abas Parametros, Servidores, Impacto_2027, Resumo_2027, RCL, LRF, Sensibilidade e Conferencia).</footer>
+</article>
+<div id="tip" role="tooltip" hidden></div>
+<script>
+(function () {
+  var tip = document.getElementById("tip");
+  function show(e) {
+    var el = e.currentTarget, r = el.getBoundingClientRect();
+    tip.textContent = el.getAttribute("data-tip");
+    tip.hidden = false;
+    var left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2));
+    tip.style.left = left + "px";
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 8) + "px";
+  }
+  function hide() { tip.hidden = true; }
+  document.querySelectorAll("[data-tip]").forEach(function (el) {
+    el.addEventListener("mouseenter", show);
+    el.addEventListener("focus", show);
+    el.addEventListener("mouseleave", hide);
+    el.addEventListener("blur", hide);
+  });
+})();
+</script>
+</body>
+</html>
